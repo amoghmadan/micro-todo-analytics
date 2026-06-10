@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package task.protobuf.v1;
+
+message PingRequest {
+  bool throw = 1;
+}
+
+message PingResponse {
+  string reply = 1;
+}
+
+service HealthService {
+  rpc Ping(PingRequest) returns (PingResponse);
+}
