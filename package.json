@@ -1,0 +1,32 @@
+{
+  "name": "task",
+  "version": "0.1.0",
+  "description": "Task service.",
+  "keywords": [
+    "gRPC"
+  ],
+  "homepage": "https://github.com/amoghmadan/cookiecutter-node-grpc/tree/javascript#readme",
+  "bugs": {
+    "url": "https://github.com/amoghmadan/cookiecutter-node-grpc/issues"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Amogh Madan amoghmadaan@gmail.com",
+  "type": "commonjs",
+  "main": "src/task/main.mjs",
+  "scripts": {
+    "start": "node --env-file=.env src/task/main.mjs",
+    "dev": "node --env-file=.env.example --watch src/task/main.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.3",
+    "@grpc/proto-loader": "^0.8.1",
+    "amqplib": "^2.0.1",
+    "commander": "^14.0.3",
+    "luxon": "^3.7.2",
+    "mongoose": "^9.2.1"
+  }
+}
