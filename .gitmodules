@@ -1,0 +1,4 @@
+[submodule "proto/auth"]
+	path = proto/auth
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = proto/auth
