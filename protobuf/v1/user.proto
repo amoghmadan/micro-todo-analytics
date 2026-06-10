@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package auth.protobuf.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message RegisterRequest {
+  string first_name = 1;
+  string last_name = 2;
+  string email = 3;
+  string password = 4;
+  string confirm_password = 5;
+}
+message RegisterResponse {
+  string first_name = 1;
+  string last_name = 2;
+  string email = 3;
+  bool is_active = 4;
+  bool is_superuser = 5;
+  google.protobuf.Timestamp date_joined = 6;
+  google.protobuf.Timestamp last_login = 7;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+message LoginResponse {
+  string token = 1;
+}
+
+service PublicUserService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+}
+
+message ProfileRequest {}
+message ProfileResponse {
+  int64 id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  bool is_active = 5;
+  bool is_superuser = 6;
+  google.protobuf.Timestamp date_joined = 7;
+  google.protobuf.Timestamp last_login = 8;
+}
+
+message PasswordChangeRequest {
+  string current_password = 1;
+  string new_password = 2;
+  string confirm_password = 3;
+}
+message PasswordChangeResponse {}
+
+message LogoutRequest {}
+message LogoutResponse {}
+
+service ProtectedUserService {
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  rpc PasswordChange(PasswordChangeRequest) returns (PasswordChangeResponse);
+  rpc Profile(ProfileRequest) returns (ProfileResponse);
+}
