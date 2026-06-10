@@ -1,0 +1,8 @@
+[submodule "services/auth-service"]
+	path = services/auth-service
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = service/auth
+[submodule "services/task-service"]
+	path = services/task-service
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = service/task
