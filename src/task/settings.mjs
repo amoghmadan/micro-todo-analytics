@@ -18,7 +18,7 @@ export const TIME_ZONE = "UTC";
 export const USE_TZ = true;
 
 export const CELERY_TASK_DEFAULT_QUEUE = "task-service-queue";
-export const CELERY_BROKER_URL = "amqp://admin:password@localhost";
+export const CELERY_BROKER_URL = process.env.CELERY_BROKER_URL;
 
 export const SERVICES = {
   grpc: {
