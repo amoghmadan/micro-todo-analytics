@@ -1,7 +1,5 @@
 import GRPCHanlder from "#/task/core/handlers/grpc.mjs";
 
-function getGRPCHandler() {
+export default function getGRPCApplication() {
   return new GRPCHanlder();
 }
-
-export default getGRPCHandler;
