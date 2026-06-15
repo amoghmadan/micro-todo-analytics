@@ -32,18 +32,17 @@ class UserRepository:
             await db.refresh(user)
         return user
 
-    async def login(self, data: dict[str, str]) -> Token:
-        statement = (
-            select(User)
-            .options(selectinload(User.token))
-            .where(User.email == data["email"])
-        )
+    async def login(self, data: dict[str, str]) -> str:
+        statement = select(User).where(User.email == data["email"])
         async with session() as db:
             result = await db.execute(statement)
             user: User = result.scalar()
+            if not user:
+                raise ValueError("Email or password incorrect.")
             if not user.check_password(data["password"]):
                 raise ValueError("Email or password incorrect.")
-            token: Token = user.token
+            result = await db.execute(select(Token).where(Token.user_id == user.pk))
+            token: Token = result.scalar()
             if token:
                 await db.delete(token)
                 await db.commit()
@@ -52,7 +51,7 @@ class UserRepository:
             db.add(token)
             await db.commit()
             await db.refresh(token)
-        return token
+        return token.key
 
     async def logout(self, user_id: int) -> None:
         statement = select(Token).where(Token.user_id == user_id)
