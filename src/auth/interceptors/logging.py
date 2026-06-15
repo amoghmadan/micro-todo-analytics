@@ -43,6 +43,12 @@ class AsyncLoggingInterceptor(ServerInterceptor):
                     logging.info(f"{root} Response from {method}: {res_text}")
                     return response
                 except Exception as e:
+                    if context.code() is not None:
+                        logging.info(
+                            f"{root} Response from {method}: "
+                            f"{context.code()} {context.details()}"
+                        )
+                        raise e
                     logging.error(f"{root} Error in {method}: {e}")
                     logging.debug(traceback.format_exc())
                     await context.abort(StatusCode.INTERNAL, "Internal Server Error")
