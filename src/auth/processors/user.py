@@ -34,7 +34,7 @@ class UserProcessor:
             token: str = await self.repository.login(payload)
         except ValueError as e:
             await context.abort(StatusCode.INVALID_ARGUMENT, e.args[0])
-        return {"token": token.key}
+        return {"token": token}
 
     async def logout(self, request, context, user) -> None:
         await self.repository.logout(user.id)
