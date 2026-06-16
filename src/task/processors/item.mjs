@@ -1,9 +1,8 @@
 import { Status } from "#/task/protobuf/server/index.mjs";
 import { itemRepository } from "#/task/repositories/index.mjs";
-import { toGRPCTimestamp } from "#/task/utils/date.mjs";
+import { formatItemAsGRPCResponse } from "#/task/utils/transform.mjs";
 
-const statusMap = Object.fromEntries(Status.type.value.map((o) => [o.name, o.number]));
-const statusMapReverse = Object.fromEntries(Status.type.value.map((o) => [o.number, o.name]));
+const STATUS = Object.fromEntries(Status.type.value.map((o) => [o.name, o.number]));
 
 async function createItem(call, callback) {
   const data = {
@@ -11,16 +10,10 @@ async function createItem(call, callback) {
     description: call.request.description,
   }
   if (call.request.status) {
-    data.status = statusMap[call.request.status];
+    data.status = STATUS[call.request.status];
   }
   const item = await itemRepository.createItem(data);
-  return {
-    id: item._id.toString(),
-    description: item.description,
-    status: statusMapReverse[item.status],
-    created_at: toGRPCTimestamp(item.createAt),
-    updated_at: toGRPCTimestamp(item.updatedAt),
-  };
+  return formatItemAsGRPCResponse(item);
 }
 
 async function listItem(call, callback) {
@@ -38,13 +31,7 @@ async function listItem(call, callback) {
   return {
     count: response.count,
     results: response.results.map((item) => {
-      return {
-        id: item._id.toString(),
-        description: item.description,
-        status: statusMapReverse[item.status],
-        created_at: toGRPCTimestamp(item.createdAt),
-        updated_at: toGRPCTimestamp(item.updatedAt),
-      }
+      return formatItemAsGRPCResponse(item);
     }),
   };
 }
@@ -56,13 +43,7 @@ async function retrieveItem(call, callback) {
   }
   const item = await itemRepository.retrieveItem(findBy);
   if (!item) throw Error("Item Not Found");
-  return {
-    id: item._id.toString(),
-    description: item.description,
-    status: statusMapReverse[item.status],
-    created_at: toGRPCTimestamp(item.createdAt),
-    updated_at: toGRPCTimestamp(item.updatedAt),
-  };
+  return formatItemAsGRPCResponse(item);
 }
 
 async function updateItem(call, callback) {
@@ -75,13 +56,7 @@ async function updateItem(call, callback) {
   if (call.request.status) data.status = statusMap[call.request.status];
   const item = await itemRepository.updateItem(findBy, data);
   if (!item) throw Error("Item Not Found");
-  return {
-    id: item._id.toString(),
-    description: item.description,
-    status: statusMapReverse[item.status],
-    created_at: toGRPCTimestamp(item.createdAt),
-    updated_at: toGRPCTimestamp(item.updatedAt),
-  };
+  return formatItemAsGRPCResponse(item);
 }
 
 async function destroyItem(call, callback) {

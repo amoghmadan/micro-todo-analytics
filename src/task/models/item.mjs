@@ -2,6 +2,7 @@ import { Schema } from "mongoose";
 
 import celery from "#/task/celery.mjs";
 import { connection } from "#/task/db/index.mjs";
+import { formatItemAsJSON } from "#/task/utils/transform.mjs";
 
 const ItemSchema = new Schema({
   userId: { type: Number, required: true },
@@ -13,12 +14,14 @@ const ItemSchema = new Schema({
 });
 
 ItemSchema.post("save", async function (doc) {
-  await celery.applyAsync("tracker.tasks.post_action", [{ ...doc.toJSON(), isDeleted: false }]);
+  const data = formatItemAsJSON(doc, false);
+  await celery.applyAsync("tracker.tasks.post_action", [data]);
 });
 
 ItemSchema.post("findOneAndDelete", async function (doc) {
   if (!doc) return;
-  await celery.applyAsync("tracker.tasks.post_action", [{ ...doc.toJSON(), isDeleted: true }]);
+  const data = formatItemAsJSON(doc, true);
+  await celery.applyAsync("tracker.tasks.post_action", [data]);
 });
 
 const Item = connection.model("Item", ItemSchema);
