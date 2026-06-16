@@ -8,7 +8,7 @@ import settings from "#/task/conf/index.mjs";
 const serverBuf = join(settings.PROTO_DIR, "task");
 
 const itemPackageDefinition = protoLoader.loadSync(join(serverBuf, "protobuf/v1/item.proto"), {
-    keepCase: true,
+    keepCase: false,
     longs: String,
     enums: String,
     defaults: false,

@@ -8,7 +8,7 @@ import settings from "#/task/conf/index.mjs";
 const clientBuf = join(settings.PROTO_DIR, "auth");
 
 const userPackageDefinition = protoLoader.loadSync(join(clientBuf, "protobuf/v1/user.proto"), {
-    keepCase: true,
+    keepCase: false,
     longs: String,
     enums: String,
     defaults: false,
