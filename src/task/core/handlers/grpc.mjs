@@ -4,23 +4,22 @@ import interceptors from "#/task/interceptors/index.mjs";
 import servicers from "#/task/registry.mjs";
 
 export default class GRPCHanlder {
-  async handle(host = "127.0.0.1", port = 50051) {
-
+  async handle(host = "::", port = 50051) {
     const server = new grpc.Server({ interceptors });
 
     servicers.forEach((implementation, service) => {
       server.addService(service, implementation);
     });
-
+    const bind = `${host.includes(":") ? `[${host}]` : host}:${port}`;
     server.bindAsync(
-      `${host}:${port}`,
+      bind,
       grpc.ServerCredentials.createInsecure(),
       (error, port) => {
         if (error) {
           console.error(error);
           return;
         }
-        console.info(`Starting server at grpc://${host}:${port}`);
+        console.info(`Starting server at grpc://${bind}`);
       },
     );
   }

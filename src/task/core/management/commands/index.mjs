@@ -7,7 +7,7 @@ commander
   .command("runserver")
   .description("Runs the server")
   .option("-p --port <port>", "Port", "50051")
-  .option("-H --host <host>", "Host", "0.0.0.0")
+  .option("-H --host <host>", "Host", "::")
   .action((options) => runserver(options.host, Number(options.port)));
 
 commander
