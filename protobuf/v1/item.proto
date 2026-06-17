@@ -38,7 +38,7 @@ message ListItemRequest {
   int64 limit = 1;
   int64 offset = 2;
   string ordering = 3;
-  int32 status = 4;
+  Status status = 4;
 }
 message ListItemResponse {
   int64 count = 1;
