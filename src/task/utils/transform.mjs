@@ -44,13 +44,12 @@ export function formatItemAsGRPCResponse(item) {
  * @param {boolean} isDeleted mark
  * @returns {Record<string, any} to proto item
  */
-export function formatItemAsJSON(item, isDeleted) {
+export function formatItemAsJSON(item) {
     return {
         id: item._id.toString(),
         description: item.description,
         status: item.status,
         created_at: item.createdAt,
         updated_at: item.updatedAt,
-        is_deleted: isDeleted,
     };
 }

@@ -14,14 +14,12 @@ const ItemSchema = new Schema({
 });
 
 ItemSchema.post("save", async function (doc) {
-  const data = formatItemAsJSON(doc, false);
-  await celery.applyAsync("tracker.tasks.post_action", [data]);
+  await celery.applyAsync("tracker.tasks.post_action", [formatItemAsJSON(doc)]);
 });
 
 ItemSchema.post("findOneAndDelete", async function (doc) {
   if (!doc) return;
-  const data = formatItemAsJSON(doc, true);
-  await celery.applyAsync("tracker.tasks.post_action", [data]);
+  await celery.applyAsync("tracker.tasks.post_action", [formatItemAsJSON(doc)]);
 });
 
 const Item = connection.model("Item", ItemSchema);

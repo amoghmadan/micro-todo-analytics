@@ -17,16 +17,13 @@ async function createItem(call, callback) {
 }
 
 async function listItem(call, callback) {
-  const status = call.request.status;
   const data = {
     userId: Number(call.call.nextCall.user.id),
     ordering: call.request.ordering ? call.request.ordering : "-createdAt",
     limit: call.request.limit ? call.request.limit : 10,
     offset: call.request.offset ? call.request.offset : 0,
   };
-  if (status > -1) {
-    data.status = status;
-  }
+  if (call.request.status) data.status = STATUS[call.request.status];
   const response = await itemRepository.listItem(data);
   return {
     count: response.count,
@@ -53,7 +50,7 @@ async function updateItem(call, callback) {
   }
   const data = {};
   if (call.request.description) data.description = call.request.description;
-  if (call.request.status) data.status = statusMap[call.request.status];
+  if (call.request.status) data.status = STATUS[call.request.status];
   const item = await itemRepository.updateItem(findBy, data);
   if (!item) throw Error("Item Not Found");
   return formatItemAsGRPCResponse(item);
