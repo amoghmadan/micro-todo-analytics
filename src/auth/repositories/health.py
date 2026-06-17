@@ -17,5 +17,5 @@ class HealthRepository:
         :return: str
         """
         async with session() as db:
-            result: Result = await db.execute(self.query, {"verison": __version__})
+            result: Result = await db.execute(self.query, {"version": __version__})
             return result.scalar_one()
