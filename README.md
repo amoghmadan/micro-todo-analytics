@@ -13,7 +13,7 @@ task service
 
 - Run the development server.
   ```bash
-  npm dev runserver
+  npm run dev runserver
   ```
   
 ## How to run Node REPL?
