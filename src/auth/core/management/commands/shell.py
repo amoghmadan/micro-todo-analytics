@@ -14,8 +14,8 @@ import click
     help="program passed in as string (terminates option list)",
 )
 @click.pass_context
-def shell(ctx: click.Context, command: str | None) -> None:
+def shell(ctx: click.Context, cmd: str | None) -> None:
     """Python shell with application context."""
-    params = ["-c", command] if command else ["-i"]
-    cmd = [sys.executable] + params
-    subprocess.call(cmd, env=os.environ, shell=False)  # nosec: B603
+    params = ["-c", cmd] if cmd else ["-i"]
+    command = [sys.executable] + params
+    subprocess.call(command, env=os.environ, shell=False)  # nosec: B603
