@@ -28,3 +28,5 @@ ENV PATH="$VENV_PATH/bin:$PATH"
 COPY --chown=$USERNAME:$USERNAME . .
 RUN pip install .
 RUN auth build
+
+ENTRYPOINT ["auth", "runserver"]
