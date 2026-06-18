@@ -5,10 +5,6 @@
   "keywords": [
     "gRPC"
   ],
-  "homepage": "https://github.com/amoghmadan/cookiecutter-node-grpc/tree/javascript#readme",
-  "bugs": {
-    "url": "https://github.com/amoghmadan/cookiecutter-node-grpc/issues"
-  },
   "license": "SEE LICENSE IN LICENSE",
   "author": "Amogh Madan amoghmadaan@gmail.com",
   "type": "commonjs",
