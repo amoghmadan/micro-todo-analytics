@@ -6,15 +6,11 @@ task service
 
 - How to install dependencies?
   ```bash
-  npm i
+  npm ci
   ```
 
 ## How to run a development server?
 
-- Build proto.
-  ```bash
-  npm start build
-  ```
 - Run the development server.
   ```bash
   npm dev runserver
