@@ -5,7 +5,7 @@ import { connection } from "#/task/db/index.mjs";
 import { formatItemAsJSON } from "#/task/utils/transform.mjs";
 
 const ItemSchema = new Schema({
-  userId: { type: Number, required: true },
+  userId: { type: Number, required: true, index: true },
   description: { type: String, required: true },
   status: { type: Number, required: true, default: 0 },
 }, {
