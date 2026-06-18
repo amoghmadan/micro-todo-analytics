@@ -1,0 +1,33 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "description": "API Gateway for UI Gateways",
+  "keywords": [
+    "API",
+    "Gateway"
+  ],
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Amogh Madan <amoghmadaan@gmail.com>",
+  "type": "module",
+  "main": "src/api/main.mjs",
+  "scripts": {
+    "dev": "node --env-file=.env.example --watch src/api/main.mjs",
+    "start": "node --env-file=.env src/api/main.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.4",
+    "@grpc/proto-loader": "^0.8.1",
+    "commander": "^15.0.0",
+    "express": "^5.2.1",
+    "graphql": "^16.14.2",
+    "graphql-http": "^1.22.4",
+    "joi": "^18.2.1",
+    "luxon": "^3.7.2",
+    "morgan": "^1.11.0",
+    "ruru": "^2.0.0"
+  }
+}

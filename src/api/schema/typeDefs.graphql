@@ -1,0 +1,47 @@
+scalar DateTime
+
+enum Status {
+    STATUS_TODO_UNSPECIFIED
+    STATUS_IN_PROGRESS
+    STATUS_DONE
+    STATUS_SCRAPED
+}
+
+type EmptyType {
+    success: Boolean!
+}
+
+type Profile {
+    firstName: String!
+    lastName: String!
+    email: String!
+    dateJoined: DateTime!
+    lastLogin: DateTime!
+}
+
+type RetrieveItem {
+    id: ID!
+    description: String!
+    status: Status!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+type ListItem {
+    count: Int!
+    results: [RetrieveItem!]!
+}
+
+type Query {
+    profile: Profile!
+    logout: EmptyType!
+    listItem(limit: Int, offset: Int, ordering: String, status: Status): ListItem!
+    retrieveItem(id: ID!): RetrieveItem!
+}
+
+type Mutation {
+    passwordChange(currentPassword: String!, newPassword: String!, confirmPassword: String!): EmptyType!
+    createItem(description: String!): RetrieveItem!
+    updateItem(id: ID!, description: String, status: Status): RetrieveItem!
+    destroyItem(id: ID!): EmptyType!
+}
