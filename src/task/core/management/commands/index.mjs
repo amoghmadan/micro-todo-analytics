@@ -11,14 +11,10 @@ commander
   .action((options) => runserver(options.host, Number(options.port)));
 
 commander
-  .command("build")
-  .description("Build proto")
-  .option("-o --outDir <outDir>", "Out Dir", "./src")
-  .action((options) => build(options.outDir));
-
-commander
   .command("shell")
   .description("Shell")
-  .action((_) => shell());
+  .option("-p --print <print>", "Print")
+  .option("-e --eval <eval>", "Eval")
+  .action((options) => shell(options));
 
 export default commander;
