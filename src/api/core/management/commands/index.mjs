@@ -1,12 +1,12 @@
 import { Command } from "commander";
-import runserver from "#/task/core/management/commands/runserver.mjs";
-import shell from "#/task/core/management/commands/shell.mjs";
+import runserver from "#/api/core/management/commands/runserver.mjs";
+import shell from "#/api/core/management/commands/shell.mjs";
 
 const commander = new Command();
 commander
   .command("runserver")
   .description("Runs the server")
-  .option("-p --port <port>", "Port", "50051")
+  .option("-p --port <port>", "Port", "4000")
   .option("-H --host <host>", "Host", "::")
   .action((options) => runserver(options.host, Number(options.port)));
 
