@@ -22,11 +22,15 @@ class UserRepository:
                 return None
             return token.user
 
-    async def register(self, data: dict[str, str]) -> User:
+    async def register(self, data: dict[str, str]) -> User | None:
+        statement = select(User).where(User.email == data["email"])
         password = data.pop("password")
         user = User(**data)
         user.set_password(password)
         async with session() as db:
+            result = await db.execute(statement)
+            if result.scalar_one_or_none():
+                return None
             db.add(user)
             await db.commit()
             await db.refresh(user)

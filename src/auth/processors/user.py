@@ -20,7 +20,10 @@ class UserProcessor:
             "email": request.email,
             "password": request.password,
         }
-        user: User = await self.repository.register(payload)
+        user: User | None = await self.repository.register(payload)
+        if not user:
+            msg = "Email is already registered."
+            await context.abort(StatusCode.INVALID_ARGUMENT, msg)
         obj = {
             c.key: getattr(user, c.key)
             for c in inspect(user).mapper.column_attrs
