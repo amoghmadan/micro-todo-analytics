@@ -6,3 +6,7 @@
 	path = services/task-service
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
 	branch = service/task
+[submodule "gateways/api-gateway"]
+	path = gateways/api-gateway
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = gateway/api
