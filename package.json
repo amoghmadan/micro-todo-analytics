@@ -7,7 +7,7 @@
   ],
   "license": "SEE LICENSE IN LICENSE",
   "author": "Amogh Madan amoghmadaan@gmail.com",
-  "type": "commonjs",
+  "type": "module",
   "main": "src/task/main.mjs",
   "scripts": {
     "start": "node --env-file=.env src/task/main.mjs",
