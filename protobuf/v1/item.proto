@@ -7,8 +7,8 @@ import "google/protobuf/timestamp.proto";
 enum Status {
   STATUS_TODO_UNSPECIFIED = 0;
   STATUS_IN_PROGRESS = 1;
-  STATUS_DONE = 3;
-  STATUS_SCRAPED = 4;
+  STATUS_DONE = 2;
+  STATUS_SCRAPED = 3;
 }
 
 message CreateItemRequest {
