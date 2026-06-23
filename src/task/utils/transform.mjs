@@ -47,9 +47,11 @@ export function formatItemAsGRPCResponse(item) {
 export function formatItemAsJSON(item) {
     return {
         id: item._id.toString(),
+        user_id: item.userId,
         description: item.description,
         status: item.status,
         created_at: item.createdAt,
         updated_at: item.updatedAt,
+        is_deleted: item.is_deleted,
     };
 }
