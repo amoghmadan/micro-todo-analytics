@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, DateTime
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -11,7 +11,6 @@ class User(models.Model):
 
     __tablename__ = "auth_user"
 
-    id = Column(Integer, primary_key=True)
     email = Column(String(255), unique=True)
     password = Column(String(255))
     first_name = Column(String(255))
