@@ -6,3 +6,7 @@
 	path = proto/task
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
 	branch = proto/task
+[submodule "proto/tracker"]
+	path = proto/tracker
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = proto/tracker
