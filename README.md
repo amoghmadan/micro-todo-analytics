@@ -13,7 +13,7 @@ task service
 
 - Run the development server.
   ```bash
-  npm run dev runserver
+  npm run dev runserver -- --port 50052
   ```
   
 ## How to run Node REPL?
