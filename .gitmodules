@@ -1,3 +1,7 @@
+[submodule "gateways/api-gateway"]
+	path = gateways/api-gateway
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = gateway/api
 [submodule "services/auth-service"]
 	path = services/auth-service
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
@@ -6,7 +10,7 @@
 	path = services/task-service
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
 	branch = service/task
-[submodule "gateways/api-gateway"]
-	path = gateways/api-gateway
+[submodule "services/tracker-service"]
+	path = services/tracker-service
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
-	branch = gateway/api
+	branch = service/tracker
