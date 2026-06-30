@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package tracker.protobuf.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message Count {
+  int64 todo = 1;
+  int64 in_progress = 2;
+  int64 done = 3;
+  int64 scraped = 4;
+  int64 total = 5;
+}
+
+message DayAnalyticsRequest {
+  google.protobuf.Timestamp date = 1;
+}
+message DayAnalyticsResponse {
+  message Hourly {
+    string hour = 1;
+    Count counts = 2;
+  }
+  repeated Hourly results = 1;
+}
+
+message WeekAnalyticsRequest {
+  google.protobuf.Timestamp date = 1;
+}
+message WeekAnalyticsResponse {
+  message Daily {
+    string weekday = 1;
+    Count counts = 2;
+  }
+  repeated Daily results = 1;
+}
+
+message MonthAnalyticsRequest {
+  google.protobuf.Timestamp date = 1;
+}
+message MonthAnalyticsResponse {
+  message Weekly {
+    string week = 1;
+    Count counts = 2;
+  }
+  repeated Weekly results = 1;
+}
+
+message YearAnalyticsRequest {
+  google.protobuf.Timestamp date = 1;
+}
+message YearAnalyticsResponse {
+  message Monthly {
+    string month = 1;
+    Count counts = 2;
+  }
+  repeated Monthly results = 1;
+}
+
+service AnalyticsService {
+  rpc DayAnalytics(DayAnalyticsRequest) returns (DayAnalyticsResponse);
+  rpc WeekAnalytics(WeekAnalyticsRequest) returns (WeekAnalyticsResponse);
+  rpc MonthAnalytics(MonthAnalyticsRequest) returns (MonthAnalyticsResponse);
+  rpc YearAnalytics(YearAnalyticsRequest) returns (YearAnalyticsResponse);
+}
