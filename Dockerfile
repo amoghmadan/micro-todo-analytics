@@ -29,4 +29,4 @@ COPY --chown=$USERNAME:$USERNAME . .
 RUN pip install .
 RUN tracker build
 
-ENTRYPOINT ["tracker", "runserver"]
+ENTRYPOINT ["tracker", "runserver", "--port", "50053"]
