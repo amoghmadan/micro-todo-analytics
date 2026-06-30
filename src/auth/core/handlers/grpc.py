@@ -15,7 +15,7 @@ class GRPCHandler:
 
     def handle(self, host: str = "::", port: int = 50051):
         async def _main() -> None:
-            bind = f"{f"[{host}]" if ":" in host else host}:{port}"
+            bind = f"{f'[{host}]' if ':' in host else host}:{port}"
             application: Server = server(
                 self.migration_thread_pool, interceptors=interceptors
             )
