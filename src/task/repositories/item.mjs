@@ -51,7 +51,7 @@ async function retrieveItem(findBy) {
  * @returns {Item | null}
  */
 async function updateItem(findBy, data) {
-  const item = await Item.findOneAndUpdate(findBy, data, { new: true });
+  const item = await Item.findOneAndUpdate(findBy, data, { returnDocument: "after" });
   return item;
 }
 

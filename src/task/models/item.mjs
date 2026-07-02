@@ -18,6 +18,11 @@ ItemSchema.post("save", async function (doc) {
   await celery.applyAsync("tracker.tasks.item.post_action", [taskDoc]);
 });
 
+ItemSchema.post("findOneAndUpdate", async function (doc) {
+  const taskDoc = { ...formatItemAsJSON(doc), is_deleted: false };
+  await celery.applyAsync("tracker.tasks.item.post_action", [taskDoc]);
+});
+
 ItemSchema.post("findOneAndDelete", async function (doc) {
   if (!doc) return;
   const taskDoc = { ...formatItemAsJSON(doc), is_deleted: true };
