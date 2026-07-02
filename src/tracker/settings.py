@@ -20,7 +20,10 @@ DEBUG = os.environ.get("DEBUG") == "True"
 DATABASES = {
     "default": {
         "url": os.environ.get("DEFAULT_DATABASE"),
-    }
+    },
+    "sync": {
+        "url": os.environ.get("SYNC_DATABASE"),
+    },
 }
 
 # Internationalization

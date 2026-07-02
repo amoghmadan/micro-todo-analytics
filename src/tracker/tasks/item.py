@@ -1,33 +1,44 @@
-import asyncio
 from datetime import datetime
 
 from celery import shared_task
-from sqlalchemy import update
+from sqlalchemy import create_engine, select, update
+from sqlalchemy.orm import sessionmaker
 
-from tracker.db import session
+from tracker.conf import settings
 from tracker.models import ItemAudit
 
-
-async def async_post_action(item: dict[str, int | str]) -> None:
-    payload = {**item, "task_id": item["id"]}
-    payload.pop("id")
-    payload["created_at"] = datetime.fromisoformat(payload["created_at"])
-    payload["updated_at"] = datetime.fromisoformat(payload["updated_at"])
-    entry = ItemAudit(**payload)
-    update_stetement = (
-        update(ItemAudit)
-        .values(is_deleted=entry.is_deleted)
-        .where(ItemAudit.task_id == entry.task_id)
-    )
-    print(entry)
-    async with session() as db:
-        if entry.is_deleted:
-            await db.execute(update_stetement)
-        db.add(entry)
-        await db.commit()
+engine = create_engine(settings.DATABASES["sync"]["url"], pool_pre_ping=True)
+Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
 @shared_task(queue="task-service-queue", ignore_result=True)
 def post_action(item: dict[str, int | str]) -> None:
     """Item: Post Action Task"""
-    asyncio.run(async_post_action(item))
+    payload = {**item, "task_id": item["id"]}
+    payload["created_at"] = datetime.fromisoformat(payload["created_at"])
+    payload["updated_at"] = datetime.fromisoformat(payload["updated_at"])
+    task_id = payload.pop("id")
+    fetch_latest_item_audit_stmt = (
+        select(ItemAudit)
+        .where(ItemAudit.task_id == task_id)
+        .order_by(ItemAudit.id.desc())
+        .limit(1)
+    )
+    update_stmt = (
+        update(ItemAudit)
+        .values(is_deleted=payload["is_deleted"])
+        .where(ItemAudit.task_id == task_id)
+    )
+    new_entry: ItemAudit = ItemAudit(**payload)
+    with Session() as db:
+        result = db.execute(fetch_latest_item_audit_stmt)
+        existing_entry: ItemAudit | None = result.scalar_one_or_none()
+        if new_entry.is_deleted:
+            db.execute(update_stmt)
+            db.add(new_entry)
+        elif existing_entry and existing_entry.status == new_entry.status:
+            existing_entry.description = new_entry.description
+            existing_entry.updated_at = new_entry.updated_at
+        else:
+            db.add(new_entry)
+        db.commit()
