@@ -42,7 +42,7 @@ auth = "auth.__main__:main"
 
 
 [tool.setuptools.packages.find]
-where = ["bin", "src"]
+where = ["src"]
 exclude = ["**/__pycache__"]
 
 

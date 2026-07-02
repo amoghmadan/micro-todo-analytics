@@ -26,7 +26,7 @@ ENV PATH="$VENV_PATH/bin:$PATH"
 
 # Copy the application code and install dependencies
 COPY --chown=$USERNAME:$USERNAME . .
-RUN pip install .
+RUN pip install -e .
 RUN auth build
 
 ENTRYPOINT ["auth", "runserver"]
