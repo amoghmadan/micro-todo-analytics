@@ -56,6 +56,13 @@ tracker service
   tracker shell
   ```
 
+# How to run the Celery Worker?
+
+- Use the following command to run the Celery consumer.
+  ```bash
+  celery -A tracker worker -l INFO -Q task-service-queue
+  ```
+
 ## How to build an image for deployment?
 
 - Use the following command to build deployable image.
