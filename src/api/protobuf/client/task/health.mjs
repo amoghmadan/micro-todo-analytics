@@ -11,7 +11,7 @@ const healthPackageDefinition = protoLoader.loadSync(join(clientBuf, "protobuf/v
     keepCase: false,
     longs: String,
     enums: String,
-    defaults: false,
+    defaults: true,
     oneofs: true,
 });
 const healthProto = grpcLibrary.loadPackageDefinition(healthPackageDefinition);

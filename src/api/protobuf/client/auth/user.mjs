@@ -11,7 +11,7 @@ const userPackageDefinition = protoLoader.loadSync(join(clientBuf, "protobuf/v1/
     keepCase: false,
     longs: String,
     enums: String,
-    defaults: false,
+    defaults: true,
     oneofs: true,
 });
 const userProto = grpcLibrary.loadPackageDefinition(userPackageDefinition);
