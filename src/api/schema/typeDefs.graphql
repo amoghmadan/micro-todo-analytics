@@ -32,11 +32,43 @@ type ListItem {
     results: [RetrieveItem!]!
 }
 
+type Count {
+    todo: Int!
+    inProgress: Int!
+    done: Int!
+    scraped: Int!
+    total: Int!
+}
+
+type DayAnalytics {
+    hour: String!
+    counts: Count!
+}
+
+type WeekAnalytics {
+    weekday: String!
+    counts: Count!
+}
+
+type MonthAnalytics {
+    week: String!
+    counts: Count!
+}
+
+type YearAnalytics {
+    month: String!
+    counts: Count!
+}
+
 type Query {
     profile: Profile!
     logout: EmptyType!
     listItem(limit: Int, offset: Int, ordering: String, status: Status): ListItem!
     retrieveItem(id: ID!): RetrieveItem!
+    dayAnalytics(date: DateTime!): [DayAnalytics!]!
+    weekAnalytics(date: DateTime!): [WeekAnalytics!]!
+    monthAnalytics(date: DateTime!): [MonthAnalytics!]!
+    yearAnalytics(date: DateTime!): [YearAnalytics!]!
 }
 
 type Mutation {
