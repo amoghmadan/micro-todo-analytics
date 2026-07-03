@@ -18,5 +18,8 @@ export const SERVICES = {
     task: {
       host: process.env.GRPC_TASK_HOST,
     },
+    tracker: {
+      host: process.env.GRPC_TRACKER_HOST,
+    },
   },
 };
