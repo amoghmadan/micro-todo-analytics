@@ -39,6 +39,7 @@ async function updateItem(call, callback) {
   } catch (e) {
     if (e.message === "Item Not Found") {
       callback({ code: status.NOT_FOUND, message: e.message });
+      return;
     }
     callback(e, null);
   }
