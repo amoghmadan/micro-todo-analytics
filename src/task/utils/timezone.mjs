@@ -26,7 +26,7 @@ function getDefaultTimezone() {
   return _cachedZone;
 }
 
-module.exports = {
+export default {
   now,
   getFixedTimezone,
   getDefaultTimezone,
