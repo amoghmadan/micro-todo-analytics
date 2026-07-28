@@ -7,4 +7,10 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  server: {
+    proxy: {
+      "/api": "http://localhost:4000",
+      "/graphql": "http://localhost:4000",
+    },
+  },
 });

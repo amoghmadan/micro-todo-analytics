@@ -1,13 +1,20 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
+import { useAuth } from "../lib/auth";
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
+export function meta() {
+  return [{ title: "Micro Todo Analytics" }];
 }
 
 export default function Home() {
-  return <Welcome />;
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading) {
+      navigate(user ? "/dashboard" : "/login", { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  return null;
 }
