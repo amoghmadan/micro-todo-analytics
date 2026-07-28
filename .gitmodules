@@ -14,3 +14,7 @@
 	path = services/tracker-service
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
 	branch = service/tracker
+[submodule "uis/web-ui"]
+	path = uis/web-ui
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = ui/web
