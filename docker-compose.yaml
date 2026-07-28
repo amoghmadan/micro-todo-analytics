@@ -1,0 +1,41 @@
+# Compose file for testing the services.
+# This does not contain any application related code.
+
+services:
+  auth-db:
+    image: postgres:17-alpine
+    container_name: PostgreSQL-Auth
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: toor
+      POSTGRES_DB: auth
+    ports:
+      - "5432:5432"
+    restart: always
+  task-db:
+    image: mongodb/mongodb-community-server:latest
+    container_name: MongoDB-Task
+    restart: always
+    ports:
+      - "27017:27017"
+  tracker-db:
+    image: postgres:17-alpine
+    container_name: PostgreSQL-Tracker
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: toor
+      POSTGRES_DB: tracker
+    ports:
+      - "5433:5432"
+    restart: always
+  mq:
+    image: rabbitmq:3-management
+    container_name: RabbitMQ
+    ports:
+      - "5672:5672"      # AMQP protocol
+      - "15672:15672"    # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: toor
+      RABBITMQ_DEFAULT_VHOST: /
+    restart: always
