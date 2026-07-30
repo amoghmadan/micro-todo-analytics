@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import type { DayAnalytics, WeekAnalytics, MonthAnalytics, YearAnalytics } from "../lib/types";
-const COUNTS_LABELS: Record<string, string> = {
-  todo: "To Do",
-  inProgress: "In Progress",
-  done: "Done",
-  scraped: "Scraped",
-};
 import { dayAnalytics, weekAnalytics, monthAnalytics, yearAnalytics } from "../lib/api";
 
 type Period = "day" | "week" | "month" | "year";
@@ -17,31 +21,26 @@ const PERIOD_LABELS: Record<Period, string> = {
   year: "Year",
 };
 
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  todo: { label: "To Do", color: "#6b7280" },
+  inProgress: { label: "In Progress", color: "#3b82f6" },
+  done: { label: "Done", color: "#22c55e" },
+  scraped: { label: "Scraped", color: "#ef4444" },
+};
+
+const LABELS = ["todo", "inProgress", "done", "scraped"] as const;
+
 export function meta() {
   return [{ title: "Analytics - Micro Todo Analytics" }];
-}
-
-function CountBar({ label, count, max }: { label: string; count: number; max: number }) {
-  const pct = max > 0 ? (count / max) * 100 : 0;
-  return (
-    <div className="flex items-center gap-2 text-xs">
-      <span className="w-20 text-right text-gray-600 dark:text-gray-400 shrink-0">{label}</span>
-      <div className="flex-1 h-5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-blue-500 rounded-full transition-all"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <span className="w-16 text-gray-900 dark:text-white font-medium">{count}</span>
-    </div>
-  );
 }
 
 export default function Analytics() {
   const today = new Date().toISOString().slice(0, 10);
   const [period, setPeriod] = useState<Period>("day");
   const [date, setDate] = useState(today);
-  const [data, setData] = useState<DayAnalytics[] | WeekAnalytics[] | MonthAnalytics[] | YearAnalytics[]>([]);
+  const [data, setData] = useState<
+    DayAnalytics[] | WeekAnalytics[] | MonthAnalytics[] | YearAnalytics[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -75,6 +74,11 @@ export default function Analytics() {
     };
     fetchData();
   }, [period, date]);
+
+  const chartData = data.map((entry: any) => {
+    const time = entry.hour || entry.weekday || entry.week || entry.month;
+    return { time, ...entry.counts };
+  });
 
   return (
     <div>
@@ -113,31 +117,47 @@ export default function Analytics() {
           <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full" />
         </div>
       ) : data.length === 0 ? (
-        <p className="text-center py-12 text-gray-500 dark:text-gray-400">No analytics data for this period.</p>
+        <p className="text-center py-12 text-gray-500 dark:text-gray-400">
+          No analytics data for this period.
+        </p>
       ) : (
-        <div className="space-y-4">
-          {data.map((entry: any) => {
-            const labels = ["todo", "inProgress", "done", "scraped"] as const;
-            const counts = entry.counts;
-            const max = Math.max(...labels.map((k) => counts[k]), 1);
-            return (
-              <div key={entry.hour || entry.weekday || entry.week || entry.month} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 capitalize">
-                  {entry.hour || entry.weekday || entry.week || entry.month}
-                </h3>
-                <div className="space-y-1.5">
-                  {labels.map((label) => (
-                    <CountBar
-                      key={label}
-                      label={COUNTS_LABELS[label]}
-                      count={counts[label]}
-                      max={max}
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4">
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis
+                dataKey="time"
+                tick={{ fontSize: 12 }}
+                stroke="#9ca3af"
+                angle={-20}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" allowDecimals={false} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--tooltip-bg, #fff)",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                }}
+                labelStyle={{ fontWeight: 600, marginBottom: 4 }}
+              />
+              <Legend />
+              {LABELS.map((key) => (
+                <Line
+                  key={key}
+                  type="monotone"
+                  dataKey={key}
+                  name={STATUS_CONFIG[key].label}
+                  stroke={STATUS_CONFIG[key].color}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       )}
     </div>
