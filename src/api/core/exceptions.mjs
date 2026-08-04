@@ -38,3 +38,15 @@ export class BadGateway extends APIError {
     super(message, 502);
   }
 }
+
+export class Conflict extends APIError {
+  constructor(message = STATUS_CODES[409]) {
+    super(message, 409);
+  }
+}
+
+export class GatewayTimeout extends APIError {
+  constructor(message = STATUS_CODES[504]) {
+    super(message, 504);
+  }
+}
