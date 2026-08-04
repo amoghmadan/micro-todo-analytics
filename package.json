@@ -1,0 +1,25 @@
+{
+  "name": "web-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/web/main.ts",
+  "scripts": {
+    "dev": "bun --watch src/web/main.ts",
+    "start": "bun src/web/main.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "hono": "^4.6.14",
+    "luxon": "^3.7.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.14",
+    "@types/luxon": "^3.7.3",
+    "typescript": "^5.9.3"
+  }
+}
