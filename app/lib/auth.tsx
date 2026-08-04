@@ -1,11 +1,18 @@
-import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from "react";
-import { getProfile, logout as apiLogout, setToken } from "./api";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { fetchSession, postAction } from "./api";
 import type { Profile } from "./types";
 
 interface AuthContextType {
   user: Profile | null;
   loading: boolean;
-  login: (token: string) => Promise<void>;
+  refresh: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -16,30 +23,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      getProfile()
-        .then(setUser)
-        .catch(() => localStorage.removeItem("token"))
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
+    fetchSession()
+      .then((session) => setUser(session.authenticated ? session.user : null))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const refresh = useCallback(async () => {
+    try {
+      const session = await fetchSession();
+      setUser(session.authenticated ? session.user : null);
+    } catch {
+      setUser(null);
     }
   }, []);
 
-  const loginFn = useCallback(async (token: string) => {
-    setToken(token);
-    const profile = await getProfile();
-    setUser(profile);
-  }, []);
-
-  const logoutFn = useCallback(async () => {
-    try { await apiLogout(); } catch {}
-    setToken(null);
+  const logout = useCallback(async () => {
+    try {
+      await postAction("logout", {});
+    } catch {
+      // Session may already be gone; clear the client state regardless.
+    }
     setUser(null);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login: loginFn, logout: logoutFn }}>
+    <AuthContext.Provider value={{ user, loading, refresh, logout }}>
       {children}
     </AuthContext.Provider>
   );

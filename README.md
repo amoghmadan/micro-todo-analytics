@@ -1,87 +1,54 @@
-# Welcome to React Router!
+# web-ui
 
-A modern, production-ready template for building full-stack React applications using React Router.
+A dumb React Router SPA that renders Server-Driven UI (SDUI) screens. It only
+knows two generic endpoints served by the web-gateway:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+- `GET /ui/sdui/<screen>` — fetch the JSON component tree for a screen;
+- `POST /action/<action>` — submit a form action.
 
-## Features
+It renders whatever components the JSON describes and submits whatever action a
+form carries — it has no knowledge of auth, data models, or business logic. The
+SPA routes live at the root (`/home`, `/login`, `/dashboard`, ...).
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
-
-## Getting Started
-
-### Installation
-
-Install the dependencies:
+## Development
 
 ```bash
 npm install
-```
-
-### Development
-
-Start the development server with HMR:
-
-```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
+The dev server runs at `http://localhost:5173` and proxies `/ui/sdui/*` and
+`/action/*` to the web-gateway at `http://localhost:3000` (see
+`vite.config.ts`). Start the web-gateway first (`bun run dev` in
+`gateways/web-gateway`).
 
-## Building for Production
-
-Create a production build:
+## Production build
 
 ```bash
 npm run build
 ```
 
+Output: `build/client` (static SPA). Assets are emitted under `/assets`.
+
 ## Deployment
 
-### Docker Deployment
+The web-ui is deployed independently behind NGINX; it is not served by the
+web-gateway. NGINX:
 
-To build and run using Docker:
+- serves the SPA from `/usr/share/nginx/html` at `/`, with an SPA fallback to
+  `/index.html`;
+- proxies `GET /ui/sdui/*` (screen fetching) and `POST /action/*` (actions) to
+  the web-gateway.
+
+### Docker
 
 ```bash
-docker build -t my-app .
+docker build -t web-ui:0.1.0 .
 
 # Run the container
-docker run -p 3000:3000 my-app
+docker run -p 8080:80 -e WEB_GATEWAY_URL=http://localhost:3000 web-ui:0.1.0
 ```
 
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+`WEB_GATEWAY_URL` is the address of the web-gateway (default
+`http://web-gateway:3000`); it must not contain a path. The NGINX config is
+`nginx/default.conf.template` and is rendered at container start via envsubst.

@@ -3,14 +3,15 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  base: "/",
   plugins: [tailwindcss(), reactRouter()],
   resolve: {
     tsconfigPaths: true,
   },
   server: {
     proxy: {
-      "/api": "http://localhost:4000",
-      "/graphql": "http://localhost:4000",
+      "/ui/sdui": "http://localhost:8080",
+      "/action": "http://localhost:8080",
     },
   },
 });
