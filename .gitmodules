@@ -2,6 +2,10 @@
 	path = gateways/api-gateway
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
 	branch = gateway/api
+[submodule "gateways/web-gateway"]
+	path = gateways/web-gateway
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = gateway/web
 [submodule "services/auth-service"]
 	path = services/auth-service
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
