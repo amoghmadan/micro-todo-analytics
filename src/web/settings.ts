@@ -14,7 +14,7 @@ export const GATEWAYS = {
 };
 
 export const SESSION = {
-  secret: process.env.SESSION_KEY ?? (DEBUG ? "dev-session-secret" : ""),
+  secret: process.env.SECRET_KEY ?? (DEBUG ? "dev-session-secret" : ""),
   cookie: {
     name: process.env.COOKIE_NAME ?? "web_gateway_session",
     maxAge: Number(process.env.COOKIE_MAX_AGE ?? 7 * 24 * 60 * 60),
