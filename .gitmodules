@@ -22,3 +22,7 @@
 	path = uis/web-ui
 	url = https://github.com/amoghmadan/micro-todo-analytics.git
 	branch = ui/web
+[submodule "deploy"]
+	path = deploy
+	url = https://github.com/amoghmadan/micro-todo-analytics.git
+	branch = deploy
