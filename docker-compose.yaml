@@ -1,0 +1,225 @@
+# Full local stack: databases, message broker, microservices, gateways and UI.
+# App images are always built from the local submodule sources on startup
+# (pull_policy: build) — nothing is pushed to or pulled from a registry.
+# The third-party data-store images (postgres/mongo/rabbitmq) are the only ones
+# fetched from Docker Hub.
+# Run from this directory:
+#   docker compose up
+
+name: mta
+
+x-postgres-healthcheck: &postgres-healthcheck
+  test: ["CMD-SHELL", "pg_isready -U root"]
+  interval: 5s
+  timeout: 5s
+  retries: 20
+
+services:
+  # ---------------------------------------------------------------------------
+  # Data stores
+  # ---------------------------------------------------------------------------
+  # Single Postgres instance hosting both the `auth` and `tracker` databases.
+  # The `tracker` database is created on first init by docker/initdb.
+  postgres:
+    image: postgres:17-alpine
+    container_name: PostgreSQL
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: toor
+      POSTGRES_DB: auth
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck: *postgres-healthcheck
+    restart: unless-stopped
+
+  task-db:
+    image: mongodb/mongodb-community-server:latest
+    container_name: MongoDB-Task
+    ports:
+      - "27017:27017"
+    volumes:
+      - task-db-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  mq:
+    image: rabbitmq:3-management
+    container_name: RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: toor
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672"    # AMQP protocol
+      - "15672:15672"  # Management UI
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Services
+  # ---------------------------------------------------------------------------
+  auth-migrate:
+    build: ../services/auth-service
+    image: mta/auth-service:0.1.0
+    pull_policy: build
+    entrypoint: ["alembic"]
+    command: ["upgrade", "head"]
+    environment:
+      DEFAULT_DATABASE: postgresql+asyncpg://root:toor@postgres:5432/auth
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  auth-service:
+    build: ../services/auth-service
+    image: mta/auth-service:0.1.0
+    pull_policy: build
+    environment:
+      SECRET_KEY: ")uki4xv@9e!b2^rax@qfcmp5#=^^*ziemm^tl1jv+f2nf9e#)$"
+      DEBUG: "True"
+      DEFAULT_DATABASE: postgresql+asyncpg://root:toor@postgres:5432/auth
+    ports:
+      - "50051:50051"
+    depends_on:
+      auth-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  task-service:
+    build: ../services/task-service
+    image: mta/task-service:0.1.0
+    pull_policy: build
+    environment:
+      SECRET_KEY: "l+qy&x%&%w4d0#&d7m^hveun8a!m3p-8@$$fv@0k9l%3*eb$$qd&"
+      DEBUG: "true"
+      DEFAULT_DATABASE: mongodb://task-db:27017/task
+      CELERY_BROKER_URL: amqp://root:toor@mq:5672
+      GRPC_AUTH_HOST: auth-service:50051
+    ports:
+      - "50052:50052"
+    depends_on:
+      task-db:
+        condition: service_healthy
+      mq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  tracker-migrate:
+    build: ../services/tracker-service
+    image: mta/tracker-service:0.1.0
+    pull_policy: build
+    entrypoint: ["alembic"]
+    command: ["upgrade", "head"]
+    environment:
+      DEFAULT_DATABASE: postgresql+asyncpg://root:toor@postgres:5432/tracker
+      SYNC_DATABASE: postgresql+psycopg://root:toor@postgres:5432/tracker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  tracker-service:
+    build: ../services/tracker-service
+    image: mta/tracker-service:0.1.0
+    pull_policy: build
+    environment:
+      SECRET_KEY: "t7+g)jf1#ir7+4x046qm2ct4=wyypkyy9f=b5z224(ye%1w-p_"
+      DEBUG: "True"
+      DEFAULT_DATABASE: postgresql+asyncpg://root:toor@postgres:5432/tracker
+      SYNC_DATABASE: postgresql+psycopg://root:toor@postgres:5432/tracker
+      CELERY_BROKER_URL: amqp://root:toor@mq:5672
+      GRPC_AUTH_HOST: auth-service:50051
+    ports:
+      - "50053:50053"
+    depends_on:
+      tracker-migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  tracker-worker:
+    build: ../services/tracker-service
+    image: mta/tracker-service:0.1.0
+    pull_policy: build
+    entrypoint: ["celery"]
+    command: ["-A", "tracker", "worker", "-l", "INFO", "-Q", "task-service-queue"]
+    environment:
+      SECRET_KEY: "t7+g)jf1#ir7+4x046qm2ct4=wyypkyy9f=b5z224(ye%1w-p_"
+      DEBUG: "True"
+      DEFAULT_DATABASE: postgresql+asyncpg://root:toor@postgres:5432/tracker
+      SYNC_DATABASE: postgresql+psycopg://root:toor@postgres:5432/tracker
+      CELERY_BROKER_URL: amqp://root:toor@mq:5672
+      GRPC_AUTH_HOST: auth-service:50051
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Gateways
+  # ---------------------------------------------------------------------------
+  api-gateway:
+    build: ../gateways/api-gateway
+    image: mta/api-gateway:0.1.0
+    pull_policy: build
+    environment:
+      SECRET_KEY: "-*ahox7m9_e^@)pt3n%479yo_f#kn((ojzl9g$$p$$&&*v9ian^c"
+      DEBUG: "true"
+      GRPC_AUTH_HOST: auth-service:50051
+      GRPC_TASK_HOST: task-service:50052
+      GRPC_TRACKER_HOST: tracker-service:50053
+    ports:
+      - "4000:4000"
+    depends_on:
+      - auth-service
+      - task-service
+      - tracker-service
+    restart: unless-stopped
+
+  web-gateway:
+    build: ../gateways/web-gateway
+    image: mta/web-gateway:0.1.0
+    pull_policy: build
+    environment:
+      DEBUG: "true"
+      API_GATEWAY_URL: http://api-gateway:4000
+      SECRET_KEY: "%*d9(s7cczfp+o%v894y&1w-g*318&72j_7v47#8-$$a*$$jc5+v"
+      COOKIE_NAME: web_gateway_session
+      COOKIE_SECURE: "false"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # UI
+  # ---------------------------------------------------------------------------
+  web-ui:
+    build: ../uis/web-ui
+    image: mta/web-ui:0.1.0
+    pull_policy: build
+    environment:
+      WEB_GATEWAY_URL: http://web-gateway:8080
+    ports:
+      - "3000:80"
+    depends_on:
+      - web-gateway
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  task-db-data:

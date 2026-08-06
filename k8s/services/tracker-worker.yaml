@@ -1,0 +1,61 @@
+# Celery worker for the tracker service. Consumes task lifecycle events
+# published by the task service onto the RabbitMQ queue and writes analytics.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracker-worker
+  namespace: mta
+  labels:
+    app.kubernetes.io/name: tracker-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tracker-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tracker-worker
+    spec:
+      containers:
+        - name: tracker-worker
+          image: mta/tracker-service:0.1.0
+          imagePullPolicy: IfNotPresent
+          command: ["celery", "-A", "tracker", "worker", "-l", "INFO", "-Q", "task-service-queue"]
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mta-secrets
+                  key: TRACKER_SECRET_KEY
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: DEBUG
+            - name: DEFAULT_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mta-secrets
+                  key: TRACKER_DATABASE_URL
+            - name: SYNC_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mta-secrets
+                  key: TRACKER_SYNC_DATABASE_URL
+            - name: CELERY_BROKER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mta-secrets
+                  key: CELERY_BROKER_URL
+            - name: GRPC_AUTH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: GRPC_AUTH_HOST
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"

@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-ui
+  namespace: mta
+  labels:
+    app.kubernetes.io/name: web-ui
+spec:
+  selector:
+    app.kubernetes.io/name: web-ui
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ui
+  namespace: mta
+  labels:
+    app.kubernetes.io/name: web-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web-ui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web-ui
+    spec:
+      containers:
+        - name: web-ui
+          image: mta/web-ui:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            # Override the baked-in default: web-gateway listens on 8080.
+            - name: WEB_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: WEB_GATEWAY_URL
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"

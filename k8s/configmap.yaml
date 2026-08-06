@@ -1,0 +1,31 @@
+# Non-sensitive configuration shared by every component.
+# Credentials live in secret.yaml; endpoints/URLs that embed passwords do too.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mta-config
+  namespace: mta
+  labels:
+    app.kubernetes.io/part-of: micro-todo-analytics
+data:
+  # Debug
+  DEBUG: "true"
+
+  # gRPC service discovery
+  GRPC_AUTH_HOST: auth-service:50051
+  GRPC_TASK_HOST: task-service:50052
+  GRPC_TRACKER_HOST: tracker-service:50053
+
+  # Mongo has no auth enabled (mirrors local docker-compose)
+  TASK_DATABASE_URL: mongodb://task-db:27017/task
+
+  # Broker queue consumed by the tracker Celery worker
+  CELERY_TASK_DEFAULT_QUEUE: task-service-queue
+
+  # Gateway wiring
+  API_GATEWAY_URL: http://api-gateway:4000
+  WEB_GATEWAY_URL: http://web-gateway:8080
+
+  # Session cookie
+  COOKIE_NAME: web_gateway_session
+  COOKIE_SECURE: "false"

@@ -1,0 +1,22 @@
+# Entry point for the whole UI. Requires an ingress controller
+# (e.g. minikube addons enable ingress, kind + ingress-nginx).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mta
+  namespace: mta
+  labels:
+    app.kubernetes.io/part-of: micro-todo-analytics
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: mta.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-ui
+                port:
+                  name: http

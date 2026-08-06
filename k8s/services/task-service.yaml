@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: task-service
+  namespace: mta
+  labels:
+    app.kubernetes.io/name: task-service
+spec:
+  selector:
+    app.kubernetes.io/name: task-service
+  ports:
+    - name: grpc
+      port: 50052
+      targetPort: 50052
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-service
+  namespace: mta
+  labels:
+    app.kubernetes.io/name: task-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: task-service
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: task-service
+    spec:
+      containers:
+        - name: task-service
+          image: mta/task-service:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 50052
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mta-secrets
+                  key: TASK_SECRET_KEY
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: DEBUG
+            - name: DEFAULT_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: TASK_DATABASE_URL
+            - name: CELERY_BROKER_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mta-secrets
+                  key: CELERY_BROKER_URL
+            - name: GRPC_AUTH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: GRPC_AUTH_HOST
+          readinessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: grpc
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"

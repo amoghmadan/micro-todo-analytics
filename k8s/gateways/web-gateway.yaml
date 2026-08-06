@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-gateway
+  namespace: mta
+  labels:
+    app.kubernetes.io/name: web-gateway
+spec:
+  selector:
+    app.kubernetes.io/name: web-gateway
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-gateway
+  namespace: mta
+  labels:
+    app.kubernetes.io/name: web-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web-gateway
+    spec:
+      containers:
+        - name: web-gateway
+          image: mta/web-gateway:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: DEBUG
+            - name: API_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: API_GATEWAY_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mta-secrets
+                  key: WEB_SECRET_KEY
+            - name: COOKIE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: COOKIE_NAME
+            - name: COOKIE_SECURE
+              valueFrom:
+                configMapKeyRef:
+                  name: mta-config
+                  key: COOKIE_SECURE
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
