@@ -19,4 +19,4 @@ USER $USERNAME
 # Copy the application code and install dependencies
 COPY --chown=$USERNAME:$USERNAME . .
 RUN bun install --frozen-lockfile
-ENTRYPOINT ["bun", "run", "start"]
+ENTRYPOINT ["bun", "start", "runserver"]
