@@ -1,6 +1,7 @@
 {
   "name": "web-gateway",
   "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
   "private": true,
   "type": "module",
   "main": "src/web/main.ts",
