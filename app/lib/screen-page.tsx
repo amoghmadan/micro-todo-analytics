@@ -21,27 +21,33 @@ export function ScreenPage({ screen }: { screen: string }) {
     error: "",
   });
 
-  const load = useCallback(async () => {
-    setState({ screen: null, loading: true, error: "" });
-    try {
-      const data = await fetchScreen(screen, location.search);
-      setState({ screen: data, loading: false, error: "" });
-    } catch (error) {
-      if (error instanceof ApiError && error.status === 401) {
-        await refresh();
-        navigate("/login", { replace: true });
-        return;
+  const load = useCallback(
+    async (signal?: AbortSignal) => {
+      setState({ screen: null, loading: true, error: "" });
+      try {
+        const data = await fetchScreen(screen, location.search, signal);
+        setState({ screen: data, loading: false, error: "" });
+      } catch (error) {
+        if (signal?.aborted) return;
+        if (error instanceof ApiError && error.status === 401) {
+          await refresh();
+          navigate("/login", { replace: true });
+          return;
+        }
+        setState({
+          screen: null,
+          loading: false,
+          error: error instanceof Error ? error.message : "Failed to load screen",
+        });
       }
-      setState({
-        screen: null,
-        loading: false,
-        error: error instanceof Error ? error.message : "Failed to load screen",
-      });
-    }
-  }, [screen, location.search, refresh, navigate]);
+    },
+    [screen, location.search, refresh, navigate]
+  );
 
   useEffect(() => {
-    load();
+    const controller = new AbortController();
+    load(controller.signal);
+    return () => controller.abort();
   }, [load]);
 
   if (state.loading) {

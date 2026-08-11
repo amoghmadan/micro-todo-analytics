@@ -11,9 +11,13 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading) {
+    let disposed = false;
+    if (!loading && !disposed) {
       navigate(user ? "/dashboard" : "/login", { replace: true });
     }
+    return () => {
+      disposed = true;
+    };
   }, [user, loading, navigate]);
 
   return null;

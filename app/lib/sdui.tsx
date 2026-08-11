@@ -389,9 +389,9 @@ function FormComponent({ comp }: { comp: Extract<SduiComponent, { type: "form" }
     const form = event.currentTarget;
 
     if (comp.props.method === "get") {
-      const params = new URLSearchParams();
-      new FormData(form).forEach((value, key) => params.set(key, String(value)));
-      ctx.navigate(`${comp.props.action}${params.size ? `?${params.toString()}` : ""}`);
+      const url = new URL(comp.props.action, window.location.origin);
+      new FormData(form).forEach((value, key) => url.searchParams.set(key, String(value)));
+      ctx.navigate(url.pathname + url.search);
       return;
     }
 
@@ -623,8 +623,11 @@ function PaginationComponent({
   const { page, totalPages, baseHref } = comp.props;
   if (totalPages <= 1) return null;
 
-  const hrefFor = (target: number) =>
-    `${baseHref}${baseHref.includes("?") ? "&" : "?"}page=${target}`;
+  const hrefFor = (target: number) => {
+    const url = new URL(baseHref, window.location.origin);
+    url.searchParams.set("page", String(target));
+    return url.pathname + url.search;
+  };
   const linkClasses =
     "px-3 py-1.5 text-sm rounded-lg border border-gray-300 bg-white shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700";
 

@@ -23,10 +23,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSession()
-      .then((session) => setUser(session.authenticated ? session.user : null))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+    const controller = new AbortController();
+    const { signal } = controller;
+    fetchSession(signal)
+      .then((session) => {
+        if (!signal.aborted) setUser(session.authenticated ? session.user : null);
+      })
+      .catch(() => {
+        if (!signal.aborted) setUser(null);
+      })
+      .finally(() => {
+        if (!signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   const refresh = useCallback(async () => {

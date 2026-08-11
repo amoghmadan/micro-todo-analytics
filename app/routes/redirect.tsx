@@ -5,7 +5,13 @@ export default function Redirect() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate("/home", { replace: true });
+    let disposed = false;
+    if (!disposed) {
+      navigate("/home", { replace: true });
+    }
+    return () => {
+      disposed = true;
+    };
   }, [navigate]);
 
   return null;

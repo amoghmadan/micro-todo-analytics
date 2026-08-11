@@ -23,9 +23,12 @@ async function parseJson(response: Response): Promise<unknown> {
   }
 }
 
-export async function fetchScreen(name: string, search = ""): Promise<SduiScreen> {
-  const response = await fetch(`${SCREEN_URL}/sdui/${name}${search}`, {
+export async function fetchScreen(name: string, search = "", signal?: AbortSignal): Promise<SduiScreen> {
+  const url = new URL(`${SCREEN_URL}/sdui/${name}`, window.location.origin);
+  new URLSearchParams(search).forEach((value, key) => url.searchParams.set(key, value));
+  const response = await fetch(url, {
     headers: { Accept: "application/json" },
+    signal,
   });
   const json = (await parseJson(response)) as { error?: string } | SduiScreen | null;
   if (!response.ok) {
@@ -39,9 +42,10 @@ export interface SessionInfo {
   user: Profile | null;
 }
 
-export async function fetchSession(): Promise<SessionInfo> {
+export async function fetchSession(signal?: AbortSignal): Promise<SessionInfo> {
   const response = await fetch(`${SCREEN_URL}/sdui/session`, {
     headers: { Accept: "application/json" },
+    signal,
   });
   const json = (await parseJson(response)) as SessionInfo | { error?: string } | null;
   if (!response.ok) {
@@ -60,12 +64,14 @@ export interface ActionResponse {
 
 export async function postAction(
   action: string,
-  fields: Record<string, string>
+  fields: Record<string, string>,
+  signal?: AbortSignal
 ): Promise<ActionResponse> {
   const response = await fetch(`${ACTION_URL}/${action}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ fields }),
+    signal,
   });
   const json = (await parseJson(response)) as ActionResponse | { error?: string } | null;
   if (!response.ok && !json) {
