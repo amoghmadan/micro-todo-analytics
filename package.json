@@ -14,6 +14,8 @@
     "#/*": "./src/*"
   },
   "dependencies": {
+    "@logtape/hono": "^2.3.0",
+    "@logtape/logtape": "^2.3.0",
     "commander": "^15.0.0",
     "hono": "^4.6.14",
     "luxon": "^3.7.2"

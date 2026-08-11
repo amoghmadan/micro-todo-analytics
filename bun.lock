@@ -5,6 +5,8 @@
     "": {
       "name": "web-gateway",
       "dependencies": {
+        "@logtape/hono": "^2.3.0",
+        "@logtape/logtape": "^2.3.0",
         "commander": "^15.0.0",
         "hono": "^4.6.14",
         "luxon": "^3.7.2",
@@ -17,6 +19,10 @@
     },
   },
   "packages": {
+    "@logtape/hono": ["@logtape/hono@2.3.0", "", { "peerDependencies": { "@logtape/logtape": "^2.3.0", "hono": "^4.0.0" } }, "sha512-+aYoPfhEeOVW1hiQwx7Tv2fbNSbOPQhx5EBZ/8JXAXt9j1w0h63X0M/MjyhjBh6Mp22gnOdNLTF6l5Tg2RIcJw=="],
+
+    "@logtape/logtape": ["@logtape/logtape@2.3.0", "", {}, "sha512-s/pxCgf9Gg75ypTV/bRUq355Dy/JP/zUJWfgJQPO5pTkXC23X2AXBcmBBgFiWH+bSi4yiX/G06qGV8CdAWD3SA=="],
+
     "@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 
     "@types/luxon": ["@types/luxon@3.7.3", "", {}, "sha512-pE7BSbKHiojpl4v7iEzdfFLXXJaH5RPJxI3Wr4x3HU59l83PJfhcUx4mGPWq245+DCAENAzRF/+ZoYr2tJCe/g=="],

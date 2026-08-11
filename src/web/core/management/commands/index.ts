@@ -9,7 +9,9 @@ commander
   .description("Runs the server")
   .option("-p --port <port>", "Port", "8080")
   .option("-H --host <host>", "Host", "0.0.0.0")
-  .action((options) => runserver(options.host, Number(options.port)));
+  .action(async (options) => {
+    await runserver(options.host, Number(options.port));
+  });
 
 commander
   .command("shell")
