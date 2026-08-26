@@ -7,7 +7,7 @@ export const DateTime = new GraphQLScalarType({
 
   serialize(value) {
     const date = fromTimestamp(value);
-    return date.toISOString();
+    return date ? date.toISOString() : null;
   },
   parseValue(value) {
     const ms = Date.parse(value);
