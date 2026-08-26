@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/part-of: micro-todo-analytics
 data:
   # Debug
-  DEBUG: "true"
+  DEBUG: "True"
 
   # gRPC service discovery
   GRPC_AUTH_HOST: auth-service:50051

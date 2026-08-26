@@ -166,6 +166,8 @@ services:
         condition: service_healthy
       mq:
         condition: service_healthy
+      tracker-migrate:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   # ---------------------------------------------------------------------------
