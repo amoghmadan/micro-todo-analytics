@@ -5,9 +5,4 @@ async function profile(args, context) {
     return data;
 }
 
-async function logout(args, context) {
-    await authAdapter.logout(context.metadata);
-    return { success: true };
-}
-
-export default { profile, logout };
+export default { profile };

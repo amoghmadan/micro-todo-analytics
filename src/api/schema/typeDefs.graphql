@@ -62,7 +62,6 @@ type YearAnalytics {
 
 type Query {
     profile: Profile!
-    logout: EmptyType!
     listItem(limit: Int, offset: Int, ordering: String, status: Status): ListItem!
     retrieveItem(id: ID!): RetrieveItem!
     dayAnalytics(date: DateTime!): [DayAnalytics!]!
@@ -72,6 +71,7 @@ type Query {
 }
 
 type Mutation {
+    logout: EmptyType!
     passwordChange(currentPassword: String!, newPassword: String!, confirmPassword: String!): EmptyType!
     createItem(description: String!): RetrieveItem!
     updateItem(id: ID!, description: String, status: Status): RetrieveItem!
