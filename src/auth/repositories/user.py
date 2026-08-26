@@ -17,10 +17,10 @@ class UserRepository:
         )
         async with session() as db:
             result = await db.execute(statement)
-            token: Token = result.scalar()
-            if not token:
+            token_obj: Token = result.scalar()
+            if not token_obj:
                 return None
-            return token.user
+            return token_obj.user
 
     async def register(self, data: dict[str, str]) -> User | None:
         statement = select(User).where(User.email == data["email"])
@@ -62,14 +62,17 @@ class UserRepository:
         async with session() as db:
             result = await db.execute(statement)
             token_obj = result.scalar()
-            await db.delete(token_obj)
-            await db.commit()
+            if token_obj:
+                await db.delete(token_obj)
+                await db.commit()
 
     async def password_change(self, data: dict[str, str]) -> None:
         statement = select(User).where(User.id == data["id"])
         async with session() as db:
             result = await db.execute(statement)
             user: User = result.scalar()
+            if not user:
+                raise ValueError("User not found.")
             if not user.check_password(data["current_password"]):
                 raise ValueError("Invalid current password.")
             user.set_password(data["new_password"])

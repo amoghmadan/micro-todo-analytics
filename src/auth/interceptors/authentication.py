@@ -32,11 +32,13 @@ class AsyncAuthInterceptor(ServerInterceptor):
 
             if not authorization or not authorization.startswith("Bearer "):
                 await context.abort(StatusCode.UNAUTHENTICATED, "Invalid Token")
+                return
 
             token = authorization.removeprefix("Bearer ")
             user: User = await self.repository.from_token(token)
             if not user:
                 await context.abort(StatusCode.UNAUTHENTICATED, "Invalid Token")
+                return
 
             current_user.set(user)
             return await handler.unary_unary(request, context)
