@@ -26,7 +26,7 @@ async function retrieveItem(call, callback) {
     callback(null, response);
   } catch (e) {
     if (e.message === "Item Not Found") {
-      callback({ code: status.NOT_FOUND, message: e.message });
+      return callback({ code: status.NOT_FOUND, message: e.message });
     }
     callback(e, null);
   }
@@ -51,7 +51,7 @@ async function destroyItem(call, callback) {
     callback(null, {});
   } catch (e) {
     if (e.message === "Item Not Found") {
-      callback({ code: status.NOT_FOUND, message: e.message });
+      return callback({ code: status.NOT_FOUND, message: e.message });
     }
     callback(e, null);
   }
