@@ -11,7 +11,7 @@ import { accountsValidator } from "#/api/validators/index.mjs";
 async function health(request, response) {
     try {
         const data = await accountsService.health(request.headers);
-        return response.status(201).json(data);
+        return response.status(200).json(data);
     } catch (e) {
         console.error(e);
         if (e.isJoi) return response.status(400).json(e.details);
