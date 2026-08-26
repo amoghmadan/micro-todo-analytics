@@ -18,6 +18,8 @@ class Model(AsyncAttrs, DeclarativeBase):
         return tuple(getattr(self, col, None) for col in pk_columns)
 
     def __eq__(self, other) -> bool:
+        if not isinstance(other, Model):
+            return NotImplemented
         return self.pk == other.pk
 
     def __repr__(self) -> str:

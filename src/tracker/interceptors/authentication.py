@@ -32,8 +32,10 @@ class AsyncAuthInterceptor(ServerInterceptor):
                     user = stub.Profile(user_pb2.ProfileRequest(), metadata=metadata)
                 except _InactiveRpcError as e:
                     await context.abort(StatusCode.UNAVAILABLE, e.details())
+                    return
             if not user:
                 await context.abort(StatusCode.UNAUTHENTICATED, "Invalid Token")
+                return
 
             current_user.set(user)
             response = await handler.unary_unary(request, context)

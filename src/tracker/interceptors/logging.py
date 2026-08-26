@@ -48,7 +48,7 @@ class AsyncLoggingInterceptor(ServerInterceptor):
                             f"{root} Response from {method}: "
                             f"{context.code()} {context.details()}"
                         )
-                        raise e
+                        raise
                     logging.error(f"{root} Error in {method}: {e}")
                     logging.debug(traceback.format_exc())
                     await context.abort(StatusCode.INTERNAL, "Internal Server Error")

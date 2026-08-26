@@ -11,7 +11,7 @@ class AnalyticsProcessor:
     repository = AnalyticsRepository()
 
     async def day_analytics(self, request, context):
-        user = current_user.get("user")
+        user = current_user.get()
         if not request.HasField("date"):
             await context.abort(StatusCode.INVALID_ARGUMENT, "Date is required.")
         dt = Timestamp.ToDatetime(request.date).date()
@@ -19,7 +19,7 @@ class AnalyticsProcessor:
         return data
 
     async def week_analytics(self, request, context):
-        user = current_user.get("user")
+        user = current_user.get()
         if not request.HasField("date"):
             await context.abort(StatusCode.INVALID_ARGUMENT, "Date is required.")
         dt = Timestamp.ToDatetime(request.date).date()
@@ -27,7 +27,7 @@ class AnalyticsProcessor:
         return data
 
     async def month_analytics(self, request, context):
-        user = current_user.get("user")
+        user = current_user.get()
         if not request.HasField("date"):
             await context.abort(StatusCode.INVALID_ARGUMENT, "Date is required.")
         dt = Timestamp.ToDatetime(request.date).date()
@@ -35,7 +35,7 @@ class AnalyticsProcessor:
         return data
 
     async def year_analytics(self, request, context):
-        user = current_user.get("user")
+        user = current_user.get()
         if not request.HasField("date"):
             await context.abort(StatusCode.INVALID_ARGUMENT, "Date is required.")
         dt = Timestamp.ToDatetime(request.date).date()
