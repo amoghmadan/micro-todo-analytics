@@ -14,19 +14,31 @@ const ItemSchema = new Schema({
 });
 
 ItemSchema.post("save", async function (doc) {
-  const taskDoc = { ...formatItemAsJSON(doc), is_deleted: false };
-  await celery.applyAsync("tracker.tasks.item.post_action", [taskDoc]);
+  try {
+    const taskDoc = { ...formatItemAsJSON(doc), is_deleted: false };
+    await celery.applyAsync("tracker.tasks.item.post_action", [taskDoc]);
+  } catch (e) {
+    console.error("Failed to publish save event:", e);
+  }
 });
 
 ItemSchema.post("findOneAndUpdate", async function (doc) {
-  const taskDoc = { ...formatItemAsJSON(doc), is_deleted: false };
-  await celery.applyAsync("tracker.tasks.item.post_action", [taskDoc]);
+  try {
+    const taskDoc = { ...formatItemAsJSON(doc), is_deleted: false };
+    await celery.applyAsync("tracker.tasks.item.post_action", [taskDoc]);
+  } catch (e) {
+    console.error("Failed to publish update event:", e);
+  }
 });
 
 ItemSchema.post("findOneAndDelete", async function (doc) {
   if (!doc) return;
-  const taskDoc = { ...formatItemAsJSON(doc), is_deleted: true };
-  await celery.applyAsync("tracker.tasks.item.post_action", [taskDoc]);
+  try {
+    const taskDoc = { ...formatItemAsJSON(doc), is_deleted: true };
+    await celery.applyAsync("tracker.tasks.item.post_action", [taskDoc]);
+  } catch (e) {
+    console.error("Failed to publish delete event:", e);
+  }
 });
 
 const Item = connection.model("Item", ItemSchema);
