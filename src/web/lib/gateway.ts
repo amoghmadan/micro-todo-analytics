@@ -123,7 +123,7 @@ export function register(body: {
 
 export function logout(token: string): Promise<void> {
   return graphql<{ logout: { success: boolean } }>(
-    "query { logout { success } }",
+    "mutation { logout { success } }",
     undefined,
     token
   ).then(() => undefined);
