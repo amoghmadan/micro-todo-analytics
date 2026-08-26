@@ -1,5 +1,5 @@
 import { DateTime, FixedOffsetZone } from "luxon";
-import settings from "#/task/conf/settings";
+import settings from "#/task/conf/index.mjs";
 
 function now() {
   if (settings.USE_TZ) {
