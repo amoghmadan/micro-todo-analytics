@@ -1,5 +1,7 @@
 import { Item } from "#/task/models/index.mjs";
 
+const ALLOWED_SORT_FIELDS = new Set(["createdAt"]);
+
 /**
  * Create Item
  * @param {Record<string, number | string>} data 
@@ -20,11 +22,9 @@ async function listItem(query) {
   const limit = query.limit;
   const offset = query.offset;
   const ordering = query.ordering;
-  const sort = {
-    [ordering.startsWith("-") ? ordering.slice(1, ordering.length) : ordering]: (
-      ordering.startsWith("-") ? -1 : 1
-    ),
-  };
+  const field = ordering.startsWith("-") ? ordering.slice(1) : ordering;
+  const direction = ordering.startsWith("-") ? -1 : 1;
+  const sort = ALLOWED_SORT_FIELDS.has(field) ? { [field]: direction } : { createdAt: -1 };
   const filters = {};
   if (![null, undefined].includes(query.status)) {
     filters.status = query.status;
